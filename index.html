@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Currency Converter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+      :root {
+        --primary-color: #2563eb;
+        --secondary-color: #1e40af;
+        --background-color: #f1f5f9;
+        --text-color: #1e293b;
+        --border-radius: 12px;
+        --transition: all 0.3s ease;
+      }
+
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        line-height: 1.6;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .converter-section, .historical-section {
+        background: white;
+        padding: 30px;
+        border-radius: var(--border-radius);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        margin-bottom: 30px;
+        transition: var(--transition);
+      }
+
+      .converter-section:hover, .historical-section:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+
+      h2 {
+        margin-top: 0;
+        margin-bottom: 25px;
+        color: var(--text-color);
+        font-size: 1.8em;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      h2 i {
+        color: var(--primary-color);
+      }
+
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 25px;
+      }
+
+      .input-group {
+        flex: 1 1 200px;
+        min-width: 200px;
+        position: relative;
+      }
+
+      .input-group button {
+        padding-left: 25px;
+        width: 100%;
+      }
+
+      .input-group i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #64748b;
+        z-index: 1;
+      }
+
+      .input-group button i {
+        position: relative;
+        left: 0;
+        transform: none;
+        top: 0;
+        margin-right: 8px;
+        color: currentColor;
+      }
+
+      .table-filters {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+      }
+
+      .table-filters .input-group {
+        flex: 1 1 300px;
+      }
+
+      input, select, button {
+        width: 100%;
+        padding: 12px 15px 12px 40px;
+        font-size: 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: var(--border-radius);
+        background-color: white;
+        transition: var(--transition);
+        outline: none;
+        color: var(--text-color);
+        box-sizing: border-box;
+      }
+
+      button {
+        background-color: var(--primary-color);
+        color: white;
+        cursor: pointer;
+        font-weight: 600;
+        padding: 12px 25px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-top: 20px;
+      }
+
+      th, td {
+        text-align: left;
+        padding: 15px;
+        border: 1px solid #e2e8f0;
+      }
+
+      th {
+        background-color: #f8fafc;
+        font-weight: 600;
+        color: var(--text-color);
+      }
+
+      tr:first-child th:first-child {
+        border-top-left-radius: var(--border-radius);
+      }
+
+      tr:first-child th:last-child {
+        border-top-right-radius: var(--border-radius);
+      }
+
+      tr:last-child td:first-child {
+        border-bottom-left-radius: var(--border-radius);
+      }
+
+      tr:last-child td:last-child {
+        border-bottom-right-radius: var(--border-radius);
+      }
+
+      tbody tr {
+        transition: var(--transition);
+      }
+
+      tbody tr:hover {
+        background-color: #f8fafc;
+      }
+
+      .conversion-result {
+        text-align: center;
+        font-size: 1.2em;
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f8fafc;
+        border-radius: var(--border-radius);
+        color: var(--text-color);
+      }
+
+      @media (max-width: 768px) {
+        .filters {
+          flex-direction: column;
+        }
+
+        .input-group {
+          width: 100%;
+          min-width: 100%;
+        }
+
+        .table-filters {
+          flex-direction: column;
+        }
+
+        .table-filters .input-group {
+          width: 100%;
+          min-width: 100%;
+        }
+
+        input, select, button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Currency Converter</h1>
+
+      <!-- Currency Converter Section -->
+      <div class="converter-section">
+        <h2><i class="fas fa-exchange-alt"></i> Convert Currency</h2>
+        <div class="filters">
+          <div class="input-group">
+            <i class="fas fa-coins"></i>
+            <input type="number" id="amount" placeholder="Amount" value="1" />
+          </div>
+          <div class="input-group">
+            <i class="fas fa-dollar-sign"></i>
+            <select id="fromCurrency">
+              <!-- Options will be dynamically added -->
+            </select>
+          </div>
+          <div class="input-group">
+            <i class="fas fa-dollar-sign"></i>
+            <select id="toCurrency">
+              <!-- Options will be dynamically added -->
+            </select>
+          </div>
+          <div class="input-group">
+            <button onclick="convertCurrency()"><i class="fas fa-sync-alt"></i> Convert</button>
+          </div>
+        </div>
+        <!-- Conversion Result -->
+        <div class="conversion-result" id="conversionResult"></div>
+      </div>
+
+      <!-- Historical Rates Section -->
+      <div class="historical-section">
+        <h2><i class="fas fa-chart-line"></i> Exchange Rates</h2>
+        <div class="table-filters">
+          <div class="input-group">
+            <i class="far fa-calendar-alt"></i>
+            <input type="date" id="dateInput" />
+          </div>
+          <div class="input-group">
+            <i class="fas fa-search"></i>
+            <input type="text" id="filter" placeholder="Search for a currency..." />
+          </div>
+        </div>
+        <!-- Exchange Rate Table -->
+        <table id="exchange">
+          <thead>
+            <tr>
+              <th><i class="fas fa-globe"></i> Currency</th>
+              <th><i class="fas fa-money-bill-wave"></i> Amount</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      const currenciesUrl = 'https://api.frankfurter.dev/v1/currencies';
+      const exchangeRatesUrl = 'https://api.frankfurter.dev/v1/latest?base=USD';
+      let currencyNames = {};
+      let currenciesList = [];
+
+      const fromCurrencySelect = document.getElementById('fromCurrency');
+      const toCurrencySelect = document.getElementById('toCurrency');
+      const filterInput = document.getElementById('filter');
+      const amountInput = document.getElementById('amount');
+      const dateInput = document.getElementById('dateInput');
+      const conversionResult = document.getElementById('conversionResult');
+      const table = document.getElementById('exchange').getElementsByTagName('tbody')[0];
+
+      // Set default date to today
+      dateInput.valueAsDate = new Date();
+
+      // Fetch currencies and populate dropdowns and table
+      function fetchCurrenciesAndRates() {
+        fetch(currenciesUrl)
+          .then((response) => response.json())
+          .then((data) => {
+            currencyNames = data;
+            currenciesList = Object.keys(data);
+            populateDropdowns(); // Populate dropdowns after currencies are fetched
+            fetchExchangeRates(); // Fetch exchange rates only after currencies are fetched
+          });
+      }
+
+      // Fetch exchange rates after currencies are loaded
+      function fetchExchangeRates() {
+        const date = dateInput.value || 'latest';
+        const url = `https://api.frankfurter.dev/v1/${date}?base=USD`;
+        
+        fetch(url)
+          .then((response) => response.json())
+          .then((data) => {
+            displayExchangeRates(data.rates);
+          })
+          .catch(error => {
+            console.error('Error fetching rates:', error);
+            conversionResult.textContent = 'Error fetching exchange rates. Please try again.';
+          });
+      }
+
+      // Populate the dropdowns
+      function populateDropdowns() {
+        // Populate From Currency
+        Object.keys(currencyNames).forEach((currencyCode) => {
+          const optionFrom = document.createElement('option');
+          optionFrom.value = currencyCode;
+          optionFrom.textContent = `(${currencyCode}) ${currencyNames[currencyCode]}`;
+          fromCurrencySelect.appendChild(optionFrom);
+        });
+        fromCurrencySelect.value = 'USD'; // Default from USD
+
+        // Populate To Currency
+        currenciesList.forEach((currencyCode) => {
+          const optionTo = document.createElement('option');
+          optionTo.value = currencyCode;
+          optionTo.textContent = `(${currencyCode}) ${currencyNames[currencyCode]}`;
+          toCurrencySelect.appendChild(optionTo);
+        });
+      }
+
+      // Display exchange rates in the table
+      function displayExchangeRates(rates) {
+        table.innerHTML = ''; // Clear existing rows
+        Object.keys(rates).forEach((currency) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>(${currency}) ${currencyNames[currency]}</td>
+            <td>${rates[currency]}</td>
+          `;
+          table.appendChild(row);
+        });
+      }
+
+      // Filter the table rows based on the search input
+      filterInput.addEventListener('input', () => {
+        const filterText = filterInput.value.toLowerCase();
+
+        const rows = table.getElementsByTagName('tr');
+        Array.from(rows).forEach((row) => {
+          const currencyCell = row.cells[0].textContent.toLowerCase();
+          if (currencyCell.includes(filterText)) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      });
+
+      // Add event listener for date changes
+      dateInput.addEventListener('change', fetchExchangeRates);
+
+      // Currency conversion function
+      function convertCurrency() {
+        const from = fromCurrencySelect.value;
+        const to = toCurrencySelect.value;
+        const amount = parseFloat(amountInput.value);
+
+        if (!to || isNaN(amount) || amount <= 0) {
+          conversionResult.textContent = 'Please select currencies and enter a valid amount.';
+          return;
+        }
+
+        fetch(`https://api.frankfurter.dev/v1/latest?base=${from}&symbols=${to}`)
+          .then((response) => response.json())
+          .then((data) => {
+            const convertedAmount = (amount * data.rates[to]).toFixed(2);
+            conversionResult.textContent = `${amount} ${from} = ${convertedAmount} ${to}`;
+          })
+          .catch((error) => {
+            conversionResult.textContent = 'Error fetching conversion rates.';
+          });
+      }
+
+      // Initialize the app by fetching currencies and rates
+      fetchCurrenciesAndRates();
+    </script>
+  </body>
+</html>
